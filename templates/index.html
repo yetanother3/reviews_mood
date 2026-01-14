@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Анализатор тональности</title>
+    <title>Настроение отзыва</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -169,7 +169,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>📊 Анализатор тональности текста</h1>
+        <h1>Определение настроения отзыва</h1>
         
         <div id="loading-container" class="status-container">
             <div class="spinner"></div>
@@ -178,28 +178,27 @@
         
         <div id="error-container" class="error hidden">
             <p>Ошибка загрузки модели: <span id="error-message"></span></p>
-            <p>Пожалуйста, убедитесь, что директории <code>sentiment_model</code> и <code>sentiment_tokenizer</code> находятся в текущей папке.</p>
         </div>
         
         <div class="input-group">
-            <label for="text-input">Введите текст для анализа:</label>
-            <textarea id="text-input" placeholder="Введите текст на русском языке для анализа его тональности..."></textarea>
+            <label for="text-input">Введите  отзыв на фильм:</label>
+            <textarea id="text-input" placeholder="Введите отзыв на русском языке для определения его настроения..."></textarea>
         </div>
         
         <div class="button-group">
-            <button id="analyze-btn" disabled>Проанализировать тональность</button>
+            <button id="analyze-btn" disabled>Проанализировать настроение</button>
             <button id="clear-btn">Очистить</button>
         </div>
         
         <div id="results" class="results">
-            <h2>Результаты анализа:</h2>
+            <h2>Настроение отзыва:</h2>
             <div id="sentiment-result" class="sentiment"></div>
             
             <div class="scores">
                 <h3>Детальные оценки:</h3>
                 <div class="score-item">
                     <div class="score-label">
-                        <span>Отрицательная тональность:</span>
+                        <span>Отрицательный отзыв:</span>
                         <span id="negative-value">0.00</span>
                     </div>
                     <div class="progress-container">
@@ -209,7 +208,7 @@
                 
                 <div class="score-item">
                     <div class="score-label">
-                        <span>Нейтральная тональность:</span>
+                        <span>Нейтральный отзыв:</span>
                         <span id="neutral-value">0.00</span>
                     </div>
                     <div class="progress-container">
@@ -219,7 +218,7 @@
                 
                 <div class="score-item">
                     <div class="score-label">
-                        <span>Положительная тональность:</span>
+                        <span>Положительный отзыв:</span>
                         <span id="positive-value">0.00</span>
                     </div>
                     <div class="progress-container">
@@ -241,7 +240,7 @@
             const resultsContainer = document.getElementById('results');
             const sentimentResult = document.getElementById('sentiment-result');
             
-            const defaultButtonText = "Проанализировать тональность";
+            const defaultButtonText = "Проанализировать настроение";
             
             // Функция для обновления статуса загрузки
             function updateLoadingStatus() {
@@ -282,7 +281,7 @@
                 const text = textInput.value.trim();
                 
                 if (!text) {
-                    alert('Пожалуйста, введите текст для анализа');
+                    alert('Пожалуйста, введите отзыв для анализа');
                     return;
                 }
                 
@@ -318,14 +317,37 @@
                     sentimentResult.className = 'sentiment ' + data.dominant_sentiment;
                     
                     // Детальные оценки
-                    document.getElementById('negative-value').textContent = data.all_scores[0].score.toFixed(4);
-                    document.getElementById('negative-bar').style.width = (data.all_scores[0].score * 100) + '%';
-                    
-                    document.getElementById('neutral-value').textContent = data.all_scores[1].score.toFixed(4);
-                    document.getElementById('neutral-bar').style.width = (data.all_scores[1].score * 100) + '%';
-                    
-                    document.getElementById('positive-value').textContent = data.all_scores[2].score.toFixed(4);
-                    document.getElementById('positive-bar').style.width = (data.all_scores[2].score * 100) + '%';
+                    document.getElementById('negative-bar').style.width = '0%';
+                    document.getElementById('neutral-bar').style.width = '0%';
+                    document.getElementById('positive-bar').style.width = '0%';
+
+                    // Инициализируем значения
+                    let negativeScore = 0;
+                    let neutralScore = 0;
+                    let positiveScore = 0;
+
+                    // Находим оценки по меткам (игнорируем порядок)
+                    data.all_scores.forEach(score => {
+                        if (score.label === 'negative') {
+                            negativeScore = score.score;
+                        } else if (score.label === 'neutral') {
+                            neutralScore = score.score;
+                        } else if (score.label === 'positive') {
+                            positiveScore = score.score;
+                        }
+                    });
+
+                    // Обновляем значения и прогрессбары с небольшой задержкой для анимации
+                    setTimeout(() => {
+                        document.getElementById('negative-value').textContent = negativeScore.toFixed(4);
+                        document.getElementById('negative-bar').style.width = (negativeScore * 100) + '%';
+                        
+                        document.getElementById('neutral-value').textContent = neutralScore.toFixed(4);
+                        document.getElementById('neutral-bar').style.width = (neutralScore * 100) + '%';
+                        
+                        document.getElementById('positive-value').textContent = positiveScore.toFixed(4);
+                        document.getElementById('positive-bar').style.width = (positiveScore * 100) + '%';
+                    }, 100);
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);

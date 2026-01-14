@@ -50,7 +50,7 @@ def status():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    """Анализ тональности текста"""
+    """Анализ настроения отзыва"""
     if model_loading:
         return jsonify({
             "error": "Модель еще загружается. Пожалуйста, подождите."
@@ -67,7 +67,7 @@ def analyze():
         return jsonify({"error": "Пожалуйста, введите текст для анализа"}), 400
 
     try:
-        # Анализ тональности
+        # Определение настроения
         results = classifier(text)
 
         # Карта для преобразования LABEL_X в читаемые названия
@@ -84,9 +84,9 @@ def analyze():
                 "label": label_map.get(result["label"], result["label"]),
                 "score": result["score"],
                 "display_label": {
-                    "negative": "Отрицательная",
-                    "neutral": "Нейтральная",
-                    "positive": "Положительная"
+                    "negative": "Отрицательное",
+                    "neutral": "Нейтральное",
+                    "positive": "Положительное"
                 }.get(label_map.get(
                     result["label"], result["label"]), result["label"])
             })
@@ -110,4 +110,4 @@ def analyze():
 if __name__ == '__main__':
     # Запуск приложения
     print("Запуск сервера Flask")
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
