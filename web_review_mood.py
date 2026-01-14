@@ -15,14 +15,12 @@ def load_model():
     global classifier, model_loading, model_error
 
     try:
-        print("Начинаю загрузку модели...")
         classifier = pipeline(
             "text-classification",
             model="./review_mood_model",
             tokenizer="./review_mood_tokenizer",
             top_k=None
         )
-        print("Модель успешно загружена!")
         model_loading = False
     except Exception as e:
         model_error = str(e)
@@ -111,5 +109,5 @@ def analyze():
 
 if __name__ == '__main__':
     # Запуск приложения
-    print("Запуск сервера Flask...")
+    print("Запуск сервера Flask")
     app.run(debug=False, host='0.0.0.0', port=5000)
